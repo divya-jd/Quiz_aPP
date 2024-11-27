@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'quiz_screen.dart';
 
 class SetupScreen extends StatefulWidget {
   @override
@@ -6,13 +7,10 @@ class SetupScreen extends StatefulWidget {
 }
 
 class _SetupScreenState extends State<SetupScreen> {
-  int _numQuestions = 5;
-  String _selectedCategory = "9"; // Default: General Knowledge
-  String _selectedDifficulty = "easy";
-  String _selectedType = "multiple";
-
-  final List<String> _difficultyLevels = ['easy', 'medium', 'hard'];
-  final List<String> _questionTypes = ['multiple', 'boolean'];
+  final TextEditingController _numQuestionsController = TextEditingController();
+  String selectedCategory = '9'; // Default: General Knowledge
+  String selectedDifficulty = 'easy'; // Default difficulty
+  String selectedType = 'multiple'; // Default type
 
   @override
   Widget build(BuildContext context) {
@@ -23,72 +21,74 @@ class _SetupScreenState extends State<SetupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Customize your Quiz',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            TextField(
+              controller: _numQuestionsController,
+              decoration: InputDecoration(
+                labelText: 'Number of Questions',
+                hintText: 'Enter a number (e.g., 5, 10, 15)',
+              ),
+              keyboardType: TextInputType.number,
             ),
             SizedBox(height: 16),
-            // Number of Questions
-            DropdownButtonFormField<int>(
-              value: _numQuestions,
-              decoration: InputDecoration(labelText: 'Number of Questions'),
-              items: [5, 10, 15]
-                  .map((value) => DropdownMenuItem(value: value, child: Text('$value')))
-                  .toList(),
-              onChanged: (value) {
-                setState(() => _numQuestions = value!);
-              },
-            ),
-            SizedBox(height: 16),
-            // Category Selector
-            DropdownButtonFormField<String>(
-              value: _selectedCategory,
-              decoration: InputDecoration(labelText: 'Select Category'),
+            DropdownButtonFormField(
+              value: selectedCategory,
               items: [
-                DropdownMenuItem(value: "9", child: Text('General Knowledge')),
-                DropdownMenuItem(value: "11", child: Text('Movies')),
-                DropdownMenuItem(value: "21", child: Text('Sports')),
+                DropdownMenuItem(value: '9', child: Text('General Knowledge')),
+                DropdownMenuItem(value: '21', child: Text('Sports')),
+                DropdownMenuItem(value: '23', child: Text('History')),
+                // Add more categories here
               ],
               onChanged: (value) {
-                setState(() => _selectedCategory = value!);
+                setState(() {
+                  selectedCategory = value.toString();
+                });
               },
+              decoration: InputDecoration(labelText: 'Select Category'),
             ),
             SizedBox(height: 16),
-            // Difficulty Level Selector
-            DropdownButtonFormField<String>(
-              value: _selectedDifficulty,
+            DropdownButtonFormField(
+              value: selectedDifficulty,
+              items: [
+                DropdownMenuItem(value: 'easy', child: Text('Easy')),
+                DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                DropdownMenuItem(value: 'hard', child: Text('Hard')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedDifficulty = value.toString();
+                });
+              },
               decoration: InputDecoration(labelText: 'Select Difficulty'),
-              items: _difficultyLevels
-                  .map((value) => DropdownMenuItem(value: value, child: Text(value)))
-                  .toList(),
-              onChanged: (value) {
-                setState(() => _selectedDifficulty = value!);
-              },
             ),
             SizedBox(height: 16),
-            // Question Type Selector
-            DropdownButtonFormField<String>(
-              value: _selectedType,
-              decoration: InputDecoration(labelText: 'Select Type'),
-              items: _questionTypes
-                  .map((value) => DropdownMenuItem(value: value, child: Text(value)))
-                  .toList(),
+            DropdownButtonFormField(
+              value: selectedType,
+              items: [
+                DropdownMenuItem(value: 'multiple', child: Text('Multiple Choice')),
+                DropdownMenuItem(value: 'boolean', child: Text('True/False')),
+              ],
               onChanged: (value) {
-                setState(() => _selectedType = value!);
+                setState(() {
+                  selectedType = value.toString();
+                });
               },
+              decoration: InputDecoration(labelText: 'Select Question Type'),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(
+                Navigator.push(
                   context,
-                  '/quiz',
-                  arguments: {
-                    'numQuestions': _numQuestions,
-                    'category': _selectedCategory,
-                    'difficulty': _selectedDifficulty,
-                    'type': _selectedType,
-                  },
+                  MaterialPageRoute(
+                    builder: (context) => QuizScreen(
+                      settings: {
+                        'numQuestions': _numQuestionsController.text,
+                        'category': selectedCategory,
+                        'difficulty': selectedDifficulty,
+                        'type': selectedType,
+                      },
+                    ),
+                  ),
                 );
               },
               child: Text('Start Quiz'),

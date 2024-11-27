@@ -1,44 +1,30 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
-
 import '../models/question.dart';
 
-
-
 class ApiService {
-
-  static Future<List<Question>> fetchQuestions() async {
-
-    final response = await http.get(
-
-      Uri.parse(
-
-          'https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple'),
-
-    );
-
-
+  static Future<List<Question>> fetchQuestions(
+    int numQuestions,
+    int category,
+    String difficulty,
+    String type,
+  ) async {
+    final url = Uri.parse(
+        'https://opentdb.com/api.php?amount=$numQuestions&category=$category&difficulty=$difficulty&type=$type');
+    
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
-
-      final data = json.decode(response.body);
-
-      List<Question> questions = (data['results'] as List)
-
-          .map((questionData) => Question.fromJson(questionData))
-
-          .toList();
-
-      return questions;
-
+      final data = jsonDecode(response.body);
+      if (data['response_code'] == 0) {
+        return (data['results'] as List)
+            .map((json) => Question.fromJson(json))
+            .toList();
+      } else {
+        throw Exception('No questions available for the selected settings.');
+      }
     } else {
-
-      throw Exception('Failed to load questions');
-
+      throw Exception('Failed to fetch questions.');
     }
-
   }
-
 }
-

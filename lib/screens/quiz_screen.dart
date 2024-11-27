@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import '../models/question.dart';
 import '../services/api_service.dart';
@@ -51,8 +50,8 @@ class _QuizScreenState extends State<QuizScreen> {
   Future<void> _loadQuestions() async {
     try {
       final questions = await ApiService.fetchQuestions(
-        widget.settings['numQuestions'],
-        widget.settings['category'],
+        int.parse(widget.settings['numQuestions']),
+        int.parse(widget.settings['category']),
         widget.settings['difficulty'],
         widget.settings['type'],
       );
